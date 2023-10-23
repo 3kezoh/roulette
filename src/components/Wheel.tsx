@@ -1,11 +1,14 @@
 import * as d3 from "d3";
-import { For, createMemo, type Component } from "solid-js";
+import { For, createMemo, type Component, JSX } from "solid-js";
 import { random, toDegree } from "../helpers";
 
 interface WheelProps {
   data: string[];
-  radius: number;
   from: number;
+  onTransitionEnd?: JSX.EventHandler<SVGGElement, TransitionEvent>;
+  onTransitionStart?: JSX.EventHandler<SVGGElement, TransitionEvent>;
+  radius: number;
+  innerRadius: number;
   to?: number;
 }
 
@@ -70,18 +73,28 @@ const Wheel: Component<WheelProps> = (props) => {
     return height / 2;
   }
 
+  const onTransitionEnd: JSX.EventHandler<SVGGElement, TransitionEvent> = (
+    event
+  ) => props.onTransitionEnd?.(event);
+
+  const onTransitionStart: JSX.EventHandler<SVGGElement, TransitionEvent> = (
+    event
+  ) => props.onTransitionStart?.(event);
+
   return (
     <svg width={getWidth()} height={getHeight()}>
       <g transform={`translate(${getCenterX()}, ${getCenterY()})`}>
         <g
           class={`transition-all duration-[3s] ease-[cubic-bezier(0.33,0,0,1)]`}
           style={{ rotate: `${getAngle()}rad` }}
+          onTransitionEnd={onTransitionEnd}
+          onTransitionStart={onTransitionStart}
         >
           <For each={getArcs()}>
             {({ data, startAngle, endAngle, color }) => {
               const arc = d3.arc();
               const width = getHeight();
-              const innerRadius = width / 6;
+              const innerRadius = props.innerRadius;
               const outerRadius = width / 2;
 
               const d = arc({
