@@ -4,7 +4,6 @@ import { random, toDegree } from "../helpers";
 
 interface WheelProps {
   data: string[];
-  from: number;
   onTransitionEnd?: JSX.EventHandler<SVGGElement, TransitionEvent>;
   onTransitionStart?: JSX.EventHandler<SVGGElement, TransitionEvent>;
   radius: number;
@@ -35,23 +34,45 @@ const Wheel: Component<WheelProps> = (props) => {
     return (Math.PI - step) / 2;
   }
 
-  const getAngle = createMemo<number>((previousAngle) => {
-    const { data, from, to } = props;
-    const step = getStep();
+  const getFrom = createMemo<[number] | [number, number]>(
+    ([from, to]) => {
+      if (props.to === undefined) {
+        return [from];
+      }
 
-    if (to === undefined) {
-      return previousAngle;
-    }
+      if (to === undefined) {
+        return [from, props.to];
+      }
 
-    const randomTurns = random(4, 6);
-    const nextAngle = previousAngle + randomTurns * 2 * Math.PI;
+      return [to, props.to];
+    },
+    [0],
+    { equals: false }
+  );
 
-    if (from >= to) {
-      return nextAngle + (from - to - data.length) * step;
-    }
+  const getAngle = createMemo<number>(
+    (previousAngle) => {
+      const { data, to } = props;
+      const [from] = getFrom();
 
-    return nextAngle + (from - to) * step;
-  }, getInitialAngle());
+      const step = getStep();
+
+      if (to === undefined) {
+        return previousAngle;
+      }
+
+      const randomTurns = random(4, 6);
+      const nextAngle = previousAngle + randomTurns * 2 * Math.PI;
+
+      if (from >= to) {
+        return nextAngle + (from - to - data.length) * step;
+      }
+
+      return nextAngle + (from - to) * step;
+    },
+    getInitialAngle(),
+    { equals: false }
+  );
 
   function getHeight() {
     return props.radius;

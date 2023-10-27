@@ -6,9 +6,7 @@ import { isEmpty, not, pipe, random } from "./helpers";
 const App: Component = () => {
   const [getStudents, setStudents] = createSignal<string[]>([]);
   const [getIsSpinning, setIsSpinning] = createSignal(false);
-  const [getState, setState] = createSignal<{ from: number; to?: number }>({
-    from: 0,
-  });
+  const [getTo, setTo] = createSignal(0, { equals: false });
 
   const onInput: JSX.EventHandler<HTMLInputElement, InputEvent> = async ({
     currentTarget,
@@ -25,22 +23,10 @@ const App: Component = () => {
   };
 
   function onClick() {
-    setState(({ from, to }) => {
-      const students = getStudents();
-      const nextTo = random(0, students.length - 1);
+    const students = getStudents();
+    const nextTo = random(0, students.length - 1);
 
-      if (to !== undefined) {
-        return {
-          from: to,
-          to: nextTo,
-        };
-      }
-
-      return {
-        from,
-        to: nextTo,
-      };
-    });
+    setTo(nextTo);
   }
 
   function onTransitionStart() {
@@ -62,7 +48,7 @@ const App: Component = () => {
             onTransitionStart={onTransitionStart}
             radius={500}
             innerRadius={96}
-            {...getState()}
+            to={getTo()}
           />
           <svg
             fill="none"
