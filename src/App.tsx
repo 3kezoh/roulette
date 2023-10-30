@@ -1,4 +1,4 @@
-import { JSX, Show, createSignal, type Component } from "solid-js";
+import { JSX, Show, batch, createSignal, type Component } from "solid-js";
 import Wheel from "./components/Wheel";
 import { isEmpty, not, pipe, random } from "./helpers";
 
@@ -18,7 +18,10 @@ const App: Component = () => {
     const text = await file.text();
     const students = text.split("\n");
 
-    setStudents(students);
+    batch(() => {
+      setStudents(students);
+      setTo(0);
+    });
   };
 
   function onClick() {
@@ -51,14 +54,16 @@ const App: Component = () => {
       </div>
       <Show when={pipe(getStudents(), isEmpty, not)}>
         <div class="relative h-fit self-center">
-          <Wheel
-            data={getStudents()}
-            onTransitionEnd={onTransitionEnd}
-            onTransitionStart={onTransitionStart}
-            radius={800}
-            innerRadius={128}
-            to={getTo()}
-          />
+          <Show when={getStudents()} keyed>
+            <Wheel
+              data={getStudents()}
+              onTransitionEnd={onTransitionEnd}
+              onTransitionStart={onTransitionStart}
+              radius={800}
+              innerRadius={128}
+              to={getTo()}
+            />
+          </Show>
           <svg
             viewBox="0 0 10 10"
             class="w-8 h-8 absolute top-1/2 -right-4 -translate-y-1/2"

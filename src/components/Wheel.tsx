@@ -50,28 +50,24 @@ const Wheel: Component<WheelProps> = (props) => {
     { equals: false }
   );
 
-  const getAngle = createMemo<number>(
-    (previousAngle) => {
-      const { data, to } = props;
+  const getAngle = createMemo<number>((previousAngle) => {
+    const { data, to } = props;
 
-      if (to === undefined) {
-        return previousAngle;
-      }
+    if (to === undefined) {
+      return previousAngle;
+    }
 
-      const [from] = getFrom();
-      const step = getStep();
-      const randomTurns = random(4, 6);
-      const nextAngle = previousAngle + randomTurns * 2 * Math.PI;
+    const [from] = getFrom();
+    const step = getStep();
+    const randomTurns = random(4, 6);
+    const nextAngle = previousAngle + randomTurns * 2 * Math.PI;
 
-      if (from >= to) {
-        return nextAngle + (from - to - data.length) * step;
-      }
+    if (from >= to) {
+      return nextAngle + (from - to - data.length) * step;
+    }
 
-      return nextAngle + (from - to) * step;
-    },
-    getInitialAngle(),
-    { equals: false }
-  );
+    return nextAngle + (from - to) * step;
+  }, getInitialAngle());
 
   function getHeight() {
     return props.radius;
