@@ -1,13 +1,13 @@
 import * as d3 from "d3";
-import { For, createMemo, type Component, JSX } from "solid-js";
+import { For, JSX, createMemo, type Component } from "solid-js";
 import { random, toDegree } from "../helpers";
 
 interface WheelProps {
   data: string[];
+  innerRadius: number;
   onTransitionEnd?: JSX.EventHandler<SVGGElement, TransitionEvent>;
   onTransitionStart?: JSX.EventHandler<SVGGElement, TransitionEvent>;
   radius: number;
-  innerRadius: number;
   to?: number;
 }
 
@@ -16,7 +16,7 @@ const Wheel: Component<WheelProps> = (props) => {
 
   function getArcs() {
     const { data } = props;
-    const colors = d3.quantize(d3.interpolateRainbow, data.length);
+    const colors = d3.quantize(d3.interpolateRainbow, data.length + 1);
     const arcs = pie(data);
 
     return arcs.map((arc, index) => ({ ...arc, color: colors.at(index) }));
@@ -53,14 +53,13 @@ const Wheel: Component<WheelProps> = (props) => {
   const getAngle = createMemo<number>(
     (previousAngle) => {
       const { data, to } = props;
-      const [from] = getFrom();
-
-      const step = getStep();
 
       if (to === undefined) {
         return previousAngle;
       }
 
+      const [from] = getFrom();
+      const step = getStep();
       const randomTurns = random(4, 6);
       const nextAngle = previousAngle + randomTurns * 2 * Math.PI;
 
@@ -114,7 +113,7 @@ const Wheel: Component<WheelProps> = (props) => {
           <For each={getArcs()}>
             {({ data, startAngle, endAngle, color }) => {
               const arc = d3.arc();
-              const width = getHeight();
+              const width = getWidth();
               const innerRadius = props.innerRadius;
               const outerRadius = width / 2;
 
@@ -132,13 +131,16 @@ const Wheel: Component<WheelProps> = (props) => {
               const translation = outerRadius - innerRadius / 2;
               const middleAngle = (startAngle + endAngle) / 2;
               // 88.5 (~ 90°) because 0 is at -y (12 o’clock) and positive angles proceeds clockwise.
-              const rotation = toDegree(middleAngle) - 88.5;
+              const rotation = toDegree(middleAngle) - 89.5;
               const transform = `rotate(${rotation}) translate(${translation})`;
 
               return (
                 <g>
-                  <path d={d} fill={color} stroke="black" stroke-width={1} />
-                  <text text-anchor="end" transform={transform}>
+                  <path d={d} fill={color} stroke={color} />
+                  <text
+                    transform={transform}
+                    class="text-lg font-semibold anchor-end"
+                  >
                     {data}
                   </text>
                 </g>

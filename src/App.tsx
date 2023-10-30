@@ -1,5 +1,4 @@
-import { Show, createSignal, type Component, JSX } from "solid-js";
-import Button from "./components/Button";
+import { JSX, Show, createSignal, type Component } from "solid-js";
 import Wheel from "./components/Wheel";
 import { isEmpty, not, pipe, random } from "./helpers";
 
@@ -38,41 +37,48 @@ const App: Component = () => {
   }
 
   return (
-    <div class="grid gap-2 justify-items-center">
-      <input type="file" onInput={onInput} />
+    <section class="grid justify-items-center h-screen container mx-auto py-16">
+      <div class="form-control">
+        <label class="label" for="file">
+          <span class="label-text">Pick a file</span>
+        </label>
+        <input
+          id="file"
+          type="file"
+          onInput={onInput}
+          class="file-input file-input-bordered"
+        />
+      </div>
       <Show when={pipe(getStudents(), isEmpty, not)}>
-        <div class="relative">
+        <div class="relative h-fit self-center">
           <Wheel
             data={getStudents()}
             onTransitionEnd={onTransitionEnd}
             onTransitionStart={onTransitionStart}
-            radius={500}
-            innerRadius={96}
+            radius={800}
+            innerRadius={128}
             to={getTo()}
           />
           <svg
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6 absolute top-1/2 right-0 border-2 -translate-y-1/2"
+            viewBox="0 0 10 10"
+            class="w-8 h-8 absolute top-1/2 -right-4 -translate-y-1/2"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75"
-            />
+            <polygon points="0 5, 10 10, 10 0" />
           </svg>
-          <Button
+          <button
             onClick={onClick}
             disabled={getIsSpinning()}
-            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full w-48 h-48"
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full w-64 h-64 tracking-widest text-xl font-bold transition-all"
+            classList={{
+              "hover:text-2xl": !getIsSpinning(),
+              "cursor-not-allowed": getIsSpinning(),
+            }}
           >
-            Spin
-          </Button>
+            SPIN
+          </button>
         </div>
       </Show>
-    </div>
+    </section>
   );
 };
 
