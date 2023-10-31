@@ -15,8 +15,14 @@ const App: Component = () => {
     }
 
     const [file] = currentTarget.files;
+
+    if (file.type !== "text/plain") {
+      return;
+    }
+
     const text = await file.text();
-    const students = text.split("\n");
+    const lines = text.split("\n");
+    const students = lines.filter((line) => /\S+/.test(line));
 
     batch(() => {
       setStudents(students);
@@ -47,6 +53,7 @@ const App: Component = () => {
         </label>
         <input
           id="file"
+          accept="text/plain"
           type="file"
           onInput={onInput}
           class="file-input file-input-bordered"
@@ -76,6 +83,7 @@ const App: Component = () => {
             class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full w-64 h-64 tracking-widest text-xl font-bold transition-all"
             classList={{
               "hover:text-2xl": !getIsSpinning(),
+              "hover:tracking-widest": !getIsSpinning(),
               "cursor-not-allowed": getIsSpinning(),
             }}
           >

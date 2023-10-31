@@ -28,12 +28,6 @@ const Wheel: Component<WheelProps> = (props) => {
     return endAngle - startAngle;
   }
 
-  function getInitialAngle() {
-    const step = getStep();
-
-    return (Math.PI - step) / 2;
-  }
-
   const getFrom = createMemo<[number] | [number, number]>(
     ([from, to]) => {
       if (props.to === undefined) {
@@ -46,9 +40,11 @@ const Wheel: Component<WheelProps> = (props) => {
 
       return [to, props.to];
     },
-    [0],
-    { equals: false }
+    [0]
   );
+
+  const step = getStep();
+  const initialAngle = (Math.PI - step) / 2;
 
   const getAngle = createMemo<number>((previousAngle) => {
     const { data, to } = props;
@@ -59,7 +55,7 @@ const Wheel: Component<WheelProps> = (props) => {
 
     const [from] = getFrom();
     const step = getStep();
-    const randomTurns = random(4, 6);
+    const randomTurns = random(3, 6);
     const nextAngle = previousAngle + randomTurns * 2 * Math.PI;
 
     if (from >= to) {
@@ -67,7 +63,7 @@ const Wheel: Component<WheelProps> = (props) => {
     }
 
     return nextAngle + (from - to) * step;
-  }, getInitialAngle());
+  }, initialAngle);
 
   function getHeight() {
     return props.radius;
@@ -110,8 +106,8 @@ const Wheel: Component<WheelProps> = (props) => {
             {({ data, startAngle, endAngle, color }) => {
               const arc = d3.arc();
               const width = getWidth();
-              const innerRadius = props.innerRadius;
-              const outerRadius = width / 2;
+              const { innerRadius } = props;
+              const outerRadius = width / 2 - 2;
 
               const d = arc({
                 startAngle,
@@ -126,7 +122,6 @@ const Wheel: Component<WheelProps> = (props) => {
 
               const translation = outerRadius - innerRadius / 2;
               const middleAngle = (startAngle + endAngle) / 2;
-              // 88.5 (~ 90°) because 0 is at -y (12 o’clock) and positive angles proceeds clockwise.
               const rotation = toDegree(middleAngle) - 89.5;
               const transform = `rotate(${rotation}) translate(${translation})`;
 
