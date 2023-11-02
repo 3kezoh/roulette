@@ -1,34 +1,36 @@
-## Usage
+# Roulette
 
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
+## Description
 
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
+A simple roulette wheel to randomly select a pupil's name. Designed to be run from a USB stick in a web browser without an internet connection, it's perfect for teachers in environments where internet access is limited.
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
+## Features
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+- Load a list of student names from a text file.
+- Spin the roulette wheel to randomly select a pupil.
 
-## Available Scripts
+## Getting Started
 
-In the project directory, you can run:
+### Prerequisites
 
-### `npm run dev` or `npm start`
+- A web browser (e.g., Chrome, Firefox, Edge).
+- A computer with a USB port.
+- A text file with one student name per line (e.g., students.txt).
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Installation
 
-The page will reload if you make edits.<br>
+1. Download the latest release of the Random Student Picker application from the [GitHub releases page](https://github.com/3kezoh/roulette/releases).
+2. Save the downloaded ZIP file to your USB drive.
+3. Extract the contents of the ZIP file to a folder on your USB drive.
 
-### `npm run build`
+### Usage
 
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
+1. Insert your USB drive into a computer.
+2. Navigate to the folder where you extracted the application.
+3. Open the `index.html` file in a web browser.
+4. Load your list of student names from a text file (e.g., students.txt).
+5. Click the "Spin" button to randomly select a student's name.
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+## License
 
-## Deployment
-
-You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
+This project is licensed under the [MIT License](LICENSE).
