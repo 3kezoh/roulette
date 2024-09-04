@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { For, JSX, createMemo, type Component } from "solid-js";
+import { For, createMemo, type Component, type JSX } from "solid-js";
 import { random, toDegree } from "../helpers";
 
 interface WheelProps {

@@ -1,4 +1,4 @@
-import { JSX, Show, batch, createSignal, type Component } from "solid-js";
+import { Show, batch, createSignal, type Component, type JSX } from "solid-js";
 import Wheel from "./components/Wheel";
 import { isEmpty, not, pipe, random } from "./helpers";
 
@@ -37,16 +37,24 @@ const App: Component = () => {
     setTo(nextTo);
   }
 
-  function onTransitionStart() {
-    setIsSpinning(true);
-  }
+  const onTransitionStart: JSX.EventHandler<SVGGElement, TransitionEvent> = (
+    event
+  ) => {
+    if (event.propertyName === "rotate") {
+      setIsSpinning(true);
+    }
+  };
 
-  function onTransitionEnd() {
-    setIsSpinning(false);
-  }
+  const onTransitionEnd: JSX.EventHandler<SVGGElement, TransitionEvent> = (
+    event
+  ) => {
+    if (event.propertyName === "rotate") {
+      setIsSpinning(false);
+    }
+  };
 
   return (
-    <section class="grid justify-items-center h-screen container mx-auto py-16">
+    <section class="grid justify-items-center h-screen container mx-auto py-4">
       <div class="form-control">
         <label class="label" for="file">
           <span class="label-text">Pick a file</span>
