@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type Fn = (...arg: any) => any;
 
 type FirstParameter<T extends Fn> = Parameters<T>[0];
