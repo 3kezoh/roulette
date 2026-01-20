@@ -1,9 +1,2 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer utilities {
-  .anchor-end {
-    text-anchor: end;
-  }
-}
+@import "tailwindcss";
+@plugin "daisyui";
