@@ -1,147 +1,147 @@
 import * as d3 from "d3";
-import { For, createMemo, type Component, type JSX } from "solid-js";
+import { type Component, createMemo, For, type JSX } from "solid-js";
 import { random, toDegree } from "../helpers";
 
 interface WheelProps {
-  data: string[];
-  innerRadius: number;
-  onTransitionEnd?: JSX.EventHandler<SVGGElement, TransitionEvent>;
-  onTransitionStart?: JSX.EventHandler<SVGGElement, TransitionEvent>;
-  radius: number;
-  to?: number;
+	data: string[];
+	innerRadius: number;
+	onTransitionEnd?: JSX.EventHandler<SVGGElement, TransitionEvent>;
+	onTransitionStart?: JSX.EventHandler<SVGGElement, TransitionEvent>;
+	radius: number;
+	to?: number;
 }
 
 const Wheel: Component<WheelProps> = (props) => {
-  const pie = d3.pie<string>().value(1);
+	const pie = d3.pie<string>().value(1);
 
-  function getArcs() {
-    const { data } = props;
-    const colors = d3.quantize(d3.interpolateRainbow, data.length + 1);
-    const arcs = pie(data);
+	function getArcs() {
+		const { data } = props;
+		const colors = d3.quantize(d3.interpolateRainbow, data.length + 1);
+		const arcs = pie(data);
 
-    return arcs.map((arc, index) => ({ ...arc, color: colors.at(index) }));
-  }
+		return arcs.map((arc, index) => ({ ...arc, color: colors.at(index) }));
+	}
 
-  function getStep() {
-    const [{ startAngle, endAngle }] = getArcs();
+	function getStep() {
+		const [{ startAngle, endAngle }] = getArcs();
 
-    return endAngle - startAngle;
-  }
+		return endAngle - startAngle;
+	}
 
-  const getFrom = createMemo<[number] | [number, number]>(
-    ([from, to]) => {
-      if (props.to === undefined) {
-        return [from];
-      }
+	const getFrom = createMemo<[number] | [number, number]>(
+		([from, to]) => {
+			if (props.to === undefined) {
+				return [from];
+			}
 
-      if (to === undefined) {
-        return [from, props.to];
-      }
+			if (to === undefined) {
+				return [from, props.to];
+			}
 
-      return [to, props.to];
-    },
-    [0]
-  );
+			return [to, props.to];
+		},
+		[0],
+	);
 
-  const step = getStep();
-  const initialAngle = (Math.PI - step) / 2;
+	const step = getStep();
+	const initialAngle = (Math.PI - step) / 2;
 
-  const getAngle = createMemo<number>((previousAngle) => {
-    const { data, to } = props;
+	const getAngle = createMemo<number>((previousAngle) => {
+		const { data, to } = props;
 
-    if (to === undefined) {
-      return previousAngle;
-    }
+		if (to === undefined) {
+			return previousAngle;
+		}
 
-    const [from] = getFrom();
-    const step = getStep();
-    const randomTurns = random(3, 6);
-    const nextAngle = previousAngle + randomTurns * 2 * Math.PI;
+		const [from] = getFrom();
+		const step = getStep();
+		const randomTurns = random(3, 6);
+		const nextAngle = previousAngle + randomTurns * 2 * Math.PI;
 
-    if (from >= to) {
-      return nextAngle + (from - to - data.length) * step;
-    }
+		if (from >= to) {
+			return nextAngle + (from - to - data.length) * step;
+		}
 
-    return nextAngle + (from - to) * step;
-  }, initialAngle);
+		return nextAngle + (from - to) * step;
+	}, initialAngle);
 
-  function getHeight() {
-    return props.radius;
-  }
+	function getHeight() {
+		return props.radius;
+	}
 
-  function getWidth() {
-    return props.radius;
-  }
+	function getWidth() {
+		return props.radius;
+	}
 
-  function getCenterX() {
-    const width = getWidth();
+	function getCenterX() {
+		const width = getWidth();
 
-    return width / 2;
-  }
+		return width / 2;
+	}
 
-  function getCenterY() {
-    const height = getHeight();
+	function getCenterY() {
+		const height = getHeight();
 
-    return height / 2;
-  }
+		return height / 2;
+	}
 
-  const onTransitionEnd: JSX.EventHandler<SVGGElement, TransitionEvent> = (
-    event
-  ) => props.onTransitionEnd?.(event);
+	const onTransitionEnd: JSX.EventHandler<SVGGElement, TransitionEvent> = (
+		event,
+	) => props.onTransitionEnd?.(event);
 
-  const onTransitionStart: JSX.EventHandler<SVGGElement, TransitionEvent> = (
-    event
-  ) => props.onTransitionStart?.(event);
+	const onTransitionStart: JSX.EventHandler<SVGGElement, TransitionEvent> = (
+		event,
+	) => props.onTransitionStart?.(event);
 
-  return (
-    <svg width={getWidth()} height={getHeight()}>
-      <g transform={`translate(${getCenterX()}, ${getCenterY()})`}>
-        <g
-          class={`transition-all duration-[3s] ease-[cubic-bezier(0.33,0,0,1)]`}
-          style={{ rotate: `${getAngle()}rad` }}
-          onTransitionEnd={onTransitionEnd}
-          onTransitionStart={onTransitionStart}
-        >
-          <For each={getArcs()}>
-            {({ data, startAngle, endAngle, color }) => {
-              const arc = d3.arc();
-              const width = getWidth();
-              const { innerRadius } = props;
-              const outerRadius = width / 2 - 2;
+	return (
+		<svg width={getWidth()} height={getHeight()}>
+			<g transform={`translate(${getCenterX()}, ${getCenterY()})`}>
+				<g
+					class={`transition-all duration-[3s] ease-[cubic-bezier(0.33,0,0,1)]`}
+					style={{ rotate: `${getAngle()}rad` }}
+					onTransitionEnd={onTransitionEnd}
+					onTransitionStart={onTransitionStart}
+				>
+					<For each={getArcs()}>
+						{({ data, startAngle, endAngle, color }) => {
+							const arc = d3.arc();
+							const width = getWidth();
+							const { innerRadius } = props;
+							const outerRadius = width / 2 - 2;
 
-              const d = arc({
-                startAngle,
-                endAngle,
-                innerRadius,
-                outerRadius,
-              });
+							const d = arc({
+								startAngle,
+								endAngle,
+								innerRadius,
+								outerRadius,
+							});
 
-              if (d === null) {
-                return;
-              }
+							if (d === null) {
+								return;
+							}
 
-              const translation = outerRadius - innerRadius / 2;
-              const middleAngle = (startAngle + endAngle) / 2;
-              const rotation = toDegree(middleAngle) - 89.5;
-              const transform = `rotate(${rotation}) translate(${translation})`;
+							const translation = outerRadius - innerRadius / 2;
+							const middleAngle = (startAngle + endAngle) / 2;
+							const rotation = toDegree(middleAngle) - 89.5;
+							const transform = `rotate(${rotation}) translate(${translation})`;
 
-              return (
-                <g>
-                  <path d={d} fill={color} stroke={color} />
-                  <text
-                    transform={transform}
-                    class="text-lg font-semibold anchor-end"
-                  >
-                    {data}
-                  </text>
-                </g>
-              );
-            }}
-          </For>
-        </g>
-      </g>
-    </svg>
-  );
+							return (
+								<g>
+									<path d={d} fill={color} stroke={color} />
+									<text
+										transform={transform}
+										class="text-lg font-semibold anchor-end"
+									>
+										{data}
+									</text>
+								</g>
+							);
+						}}
+					</For>
+				</g>
+			</g>
+		</svg>
+	);
 };
 
 export default Wheel;
