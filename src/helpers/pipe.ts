@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/** biome-ignore-all lint/suspicious/noExplicitAny: needed to keep pipe fully generic */
 type Fn = (...arg: any) => any;
 
 type FirstParameter<T extends Fn> = Parameters<T>[0];

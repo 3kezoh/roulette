@@ -4,10 +4,8 @@ import { random, toDegree } from "../helpers";
 
 interface WheelProps {
 	data: string[];
-	innerRadius: number;
 	onTransitionEnd?: JSX.EventHandler<SVGGElement, TransitionEvent>;
 	onTransitionStart?: JSX.EventHandler<SVGGElement, TransitionEvent>;
-	radius: number;
 	to?: number;
 }
 
@@ -65,26 +63,6 @@ const Wheel: Component<WheelProps> = (props) => {
 		return nextAngle + (from - to) * step;
 	}, initialAngle);
 
-	function getHeight() {
-		return props.radius;
-	}
-
-	function getWidth() {
-		return props.radius;
-	}
-
-	function getCenterX() {
-		const width = getWidth();
-
-		return width / 2;
-	}
-
-	function getCenterY() {
-		const height = getHeight();
-
-		return height / 2;
-	}
-
 	const onTransitionEnd: JSX.EventHandler<SVGGElement, TransitionEvent> = (
 		event,
 	) => props.onTransitionEnd?.(event);
@@ -93,9 +71,35 @@ const Wheel: Component<WheelProps> = (props) => {
 		event,
 	) => props.onTransitionStart?.(event);
 
+	const viewBox = 1000;
+	const center = viewBox / 2;
+	const padding = viewBox * 0.05;
+	const size = 1000 - padding;
+	const outerRadius = size / 2;
+	const innerRadius = outerRadius / 2;
+	const translation = outerRadius - innerRadius / 2;
+	const arcLength = (2 * Math.PI * outerRadius) / props.data.length;
+
+	const fontSize = Math.max(
+		size * 0.015,
+		Math.min(size * 0.03, arcLength * 0.33),
+	);
+
+	const pointerSize = size * 0.06;
+	const pointerHalf = pointerSize / 2;
+	const pointerX = size + padding / 2 - pointerHalf;
+	const pointerY = center - pointerHalf;
+	const pointerPoints = `0 ${pointerHalf}, ${pointerSize} ${pointerSize}, ${pointerSize} 0`;
+	const pointerTransform = `translate(${pointerX}, ${pointerY})`;
+
 	return (
-		<svg width={getWidth()} height={getHeight()}>
-			<g transform={`translate(${getCenterX()}, ${getCenterY()})`}>
+		<svg
+			role="img"
+			aria-label="roulette"
+			viewBox={`0 0 ${viewBox} ${viewBox}`}
+			class="h-full w-full"
+		>
+			<g transform={`translate(${center}, ${center})`}>
 				<g
 					class={`transition-all duration-[3s] ease-[cubic-bezier(0.33,0,0,1)]`}
 					style={{ rotate: `${getAngle()}rad` }}
@@ -105,9 +109,6 @@ const Wheel: Component<WheelProps> = (props) => {
 					<For each={getArcs()}>
 						{({ data, startAngle, endAngle, color }) => {
 							const arc = d3.arc();
-							const width = getWidth();
-							const { innerRadius } = props;
-							const outerRadius = width / 2 - 2;
 
 							const d = arc({
 								startAngle,
@@ -120,17 +121,19 @@ const Wheel: Component<WheelProps> = (props) => {
 								return;
 							}
 
-							const translation = outerRadius - innerRadius / 2;
 							const middleAngle = (startAngle + endAngle) / 2;
-							const rotation = toDegree(middleAngle) - 89.5;
+							const rotation = toDegree(middleAngle) - 90;
 							const transform = `rotate(${rotation}) translate(${translation})`;
 
 							return (
 								<g>
 									<path d={d} fill={color} stroke={color} />
 									<text
+										font-size={fontSize.toString()}
 										transform={transform}
-										class="text-lg font-semibold anchor-end"
+										text-anchor="middle"
+										dominant-baseline="middle"
+										class="tracking-wide font-bold"
 									>
 										{data}
 									</text>
@@ -140,6 +143,7 @@ const Wheel: Component<WheelProps> = (props) => {
 					</For>
 				</g>
 			</g>
+			<polygon points={pointerPoints} transform={pointerTransform} />
 		</svg>
 	);
 };
